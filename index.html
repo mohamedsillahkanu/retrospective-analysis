@@ -254,13 +254,22 @@
 <script>
   document.getElementById('footerYear').textContent = new Date().getFullYear();
 
+  // ─────────────────────────────────────────────────────────────
+  //  TOOL DATA
+  //  For each card, set "tool" to the HTML filename that should
+  //  open in the iframe. All HTML files must be in the SAME folder
+  //  as this launcher file.
+  //
+  //  Example:  tool: "output_indicators_report.html"
+  //  Leave as "" to show a "Not Configured" placeholder.
+  // ─────────────────────────────────────────────────────────────
   const toolData = [
-    { id:1, name:"DMS-PHU ITN Tracker",  desc:"Brief description of this tool and its role in the workflow.", concept:"dms_phu_concept.html", illustration:"dms_phu.mp4", tool:"dms_phu.html" },
-    { id:2, name:"Tool Name Two",         desc:"Brief description of this tool and its role in the workflow.", concept:"", illustration:"", tool:"" },
-    { id:3, name:"Tool Name Three",       desc:"Brief description of this tool and its role in the workflow.", concept:"", illustration:"", tool:"" },
-    { id:4, name:"Tool Name Four",        desc:"Brief description of this tool and its role in the workflow.", concept:"", illustration:"", tool:"" },
-    { id:5, name:"Tool Name Five",        desc:"Brief description of this tool and its role in the workflow.", concept:"", illustration:"", tool:"" },
-    { id:6, name:"Tool Name Six",         desc:"Brief description of this tool and its role in the workflow.", concept:"", illustration:"", tool:"" }
+    { id:1, name:"Output Indicators",   desc:"Shows output indicators trend analysis", tool:"output.html" },  // ← add your HTML filename here
+    { id:2, name:"Tool Name Two",   desc:"Brief description of what this tool does.", tool:"" },
+    { id:3, name:"Tool Name Three", desc:"Brief description of what this tool does.", tool:"" },
+    { id:4, name:"Tool Name Four",  desc:"Brief description of what this tool does.", tool:"" },
+    { id:5, name:"Tool Name Five",  desc:"Brief description of what this tool does.", tool:"" },
+    { id:6, name:"Tool Name Six",   desc:"Brief description of what this tool does.", tool:"" }
   ];
 
   const arrowSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
@@ -286,9 +295,7 @@
 
   let activeIdx = null, activeTab = 'concept';
   const tabMeta = {
-    concept:      { icon:'📖', title:'Concept Not Configured',      body:'Set a filename in <code>toolData[n].concept</code>.'      },
-    illustration: { icon:'🎬', title:'Illustration Not Configured', body:'Set a filename in <code>toolData[n].illustration</code>.' },
-    tool:         { icon:'🛠️', title:'Tool Not Configured',          body:'Set a filename in <code>toolData[n].tool</code>.'          }
+    tool: { icon:'🛠️', title:'Tool Not Configured', body:'Set a filename in <code>toolData[n].tool</code>.' }
   };
 
   function openTool(idx) {
