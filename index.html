@@ -184,14 +184,13 @@
 
 
 
-<div class="hero-band">
+<div class="hero-band" style="text-align:center;">
   <h1>Retrospective Analysis</h1>
-  <p>Sierra Leone National Malaria Control Programme. All tools and data files live in the same folder as this launcher. Click any card to open a tool full-screen.</p>
 </div>
 
 <main class="main">
   <div class="grid-header">
-    <div class="grid-label">Available Tools</div>
+    <div class="grid-label">Available Analysis</div>
     <div class="count-badge" id="countBadge">6 Tools</div>
   </div>
   <div class="cards-grid" id="cardsGrid"></div>
@@ -214,10 +213,6 @@
       </div>
     </div>
 
-    <div class="modal-tabs">
-      <button class="tab-btn active" id="tabTool" onclick="switchTab('tool')"><span class="tab-icon">🛠️</span> Tool</button>
-    </div>
-
     <div class="modal-body">
       <div class="state-loading" id="stateLoading"><div class="spinner"></div><div class="loading-text">Loading…</div></div>
       <div class="state-placeholder visible" id="statePlaceholder">
@@ -226,27 +221,6 @@
         <div class="placeholder-body"  id="placeholderBody">Add a filename to the matching field in <code>toolData</code>.</div>
       </div>
       <iframe class="modal-iframe" id="modalIframe"></iframe>
-      <div class="video-wrap" id="videoWrap">
-        <video id="videoPlayer" preload="metadata"></video>
-        <div class="video-controls">
-          <button class="vc-play" id="vcPlay" onclick="togglePlay()">
-            <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-          </button>
-          <div class="vc-progress-wrap">
-            <input type="range" class="vc-seek" id="vcSeek" value="0" min="0" step="0.1">
-            <div class="vc-time" id="vcTime">0:00 / 0:00</div>
-          </div>
-          <div class="vc-right">
-            <input type="range" class="vc-vol" id="vcVol" value="1" min="0" max="1" step="0.05">
-            <button class="vc-fullscreen" onclick="toggleFullscreen()" title="Fullscreen">
-              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
-                <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -264,7 +238,7 @@
   //  Leave as "" to show a "Not Configured" placeholder.
   // ─────────────────────────────────────────────────────────────
   const toolData = [
-    { id:1, name:"Output Indicators",   desc:"Shows output indicators trend analysis", tool:"output.html" },  // ← add your HTML filename here
+    { id:1, name:"Tool Name One",   desc:"Brief description of what this tool does.", tool:"" },  // ← add your HTML filename here
     { id:2, name:"Tool Name Two",   desc:"Brief description of what this tool does.", tool:"" },
     { id:3, name:"Tool Name Three", desc:"Brief description of what this tool does.", tool:"" },
     { id:4, name:"Tool Name Four",  desc:"Brief description of what this tool does.", tool:"" },
@@ -285,13 +259,13 @@
       <div class="card-footer">
         <div class="card-status">
           <div class="status-dot ${has(t.tool)?'active':''}"></div>
-          ${has(t.tool)?'Ready':'Placeholder'}
+          ${has(t.tool)?'Ready':'Coming Soon'}
         </div>
         <div class="card-arrow">${arrowSVG}</div>
       </div>
     </div>`).join('');
 
-  document.getElementById('countBadge').textContent = toolData.length + ' Tools';
+  document.getElementById('countBadge').textContent = toolData.length + ' Analysis';
 
   let activeIdx = null, activeTab = 'concept';
   const tabMeta = {
@@ -303,8 +277,6 @@
     const t = toolData[idx];
     document.getElementById('modalNum').textContent       = t.id;
     document.getElementById('modalTitleText').textContent = t.name.toUpperCase();
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tabTool').classList.add('active');
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
     loadTab('tool');
@@ -332,46 +304,37 @@
   }
 
   function loadTab(tab) {
-    const iframe=document.getElementById('modalIframe'), loading=document.getElementById('stateLoading'),
-          placeholder=document.getElementById('statePlaceholder'), newTabBtn=document.getElementById('btnNewTab'),
-          videoWrap=document.getElementById('videoWrap'), videoPlayer=document.getElementById('videoPlayer');
-    iframe.style.display='none'; iframe.src='about:blank';
-    videoWrap.classList.remove('visible'); videoPlayer.pause(); videoPlayer.src='';
-    loading.classList.remove('visible'); placeholder.classList.remove('visible');
-    newTabBtn.style.display='none';
+    const iframe      = document.getElementById('modalIframe');
+    const loading     = document.getElementById('stateLoading');
+    const placeholder = document.getElementById('statePlaceholder');
+
+    iframe.style.display = 'none';
+    iframe.src = 'about:blank';
+    loading.classList.remove('visible');
+    placeholder.classList.remove('visible');
+
     const m = tabMeta[tab];
     document.getElementById('placeholderIcon').textContent  = m.icon;
     document.getElementById('placeholderTitle').textContent = m.title;
     document.getElementById('placeholderBody').innerHTML    = m.body;
+
     const filename = toolData[activeIdx][tab];
     if (!has(filename)) { placeholder.classList.add('visible'); return; }
-    newTabBtn.style.display = 'flex';
-    if (/\.mp4$/i.test(filename.trim())) {
-      videoPlayer.src = filename; videoPlayer.load();
-      videoWrap.classList.add('visible'); resetPlayerUI(); return;
-    }
+
     loading.classList.add('visible');
-    iframe.onload = () => { if (iframe.src.endsWith('about:blank')) return; loading.classList.remove('visible'); iframe.style.display='block'; };
-    iframe.onerror = () => { loading.classList.remove('visible'); document.getElementById('placeholderTitle').textContent='File Not Found'; document.getElementById('placeholderBody').innerHTML=`Could not load <code>${filename}</code>.`; placeholder.classList.add('visible'); };
+    iframe.onload = () => {
+      if (iframe.src.endsWith('about:blank')) return;
+      loading.classList.remove('visible');
+      iframe.style.display = 'block';
+    };
+    iframe.onerror = () => {
+      loading.classList.remove('visible');
+      document.getElementById('placeholderTitle').textContent = 'File Not Found';
+      document.getElementById('placeholderBody').innerHTML = `Could not load <code>${filename}</code>.`;
+      placeholder.classList.add('visible');
+    };
     iframe.src = filename;
   }
-
-  function openNewTab() { const f=toolData[activeIdx][activeTab]; if(has(f)) window.open(f,'_blank'); }
-
-  const PLAY_ICON='<polygon points="5,3 19,12 5,21"/>', PAUSE_ICON='<rect x="6" y="3" width="4" height="18"/><rect x="14" y="3" width="4" height="18"/>';
-  function resetPlayerUI(){ document.getElementById('vcSeek').value=0; document.getElementById('vcTime').textContent='0:00 / 0:00'; document.getElementById('playIcon').innerHTML=PLAY_ICON; document.getElementById('vcVol').value=1; }
-  function fmt(s){ return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
-  function togglePlay(){ const v=document.getElementById('videoPlayer'); if(v.paused){v.play();document.getElementById('playIcon').innerHTML=PAUSE_ICON;}else{v.pause();document.getElementById('playIcon').innerHTML=PLAY_ICON;} }
-  function toggleFullscreen(){ const w=document.getElementById('videoWrap'); if(!document.fullscreenElement) w.requestFullscreen(); else document.exitFullscreen(); }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const v=document.getElementById('videoPlayer'), s=document.getElementById('vcSeek'), vv=document.getElementById('vcVol');
-    v.addEventListener('timeupdate', () => { if(!v.duration)return; s.value=(v.currentTime/v.duration)*100; document.getElementById('vcTime').textContent=`${fmt(v.currentTime)} / ${fmt(v.duration)}`; });
-    v.addEventListener('loadedmetadata', () => { s.max=100; document.getElementById('vcTime').textContent=`0:00 / ${fmt(v.duration)}`; });
-    v.addEventListener('ended', () => { document.getElementById('playIcon').innerHTML=PLAY_ICON; });
-    s.addEventListener('input', () => { if(v.duration) v.currentTime=(s.value/100)*v.duration; });
-    vv.addEventListener('input', () => { v.volume=vv.value; });
-  });
 
   function applyUpdate(){}
 </script>
